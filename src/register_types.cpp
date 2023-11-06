@@ -6,22 +6,12 @@
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/godot.hpp>
 
-#include "my_node.hpp"
-#include "my_singleton.hpp"
-
 using namespace godot;
-
-static MySingleton *_my_singleton;
 
 void voxel_godot_initialize(ModuleInitializationLevel p_level)
 {
 	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE)
 	{
-		ClassDB::register_class<MyNode>();
-		ClassDB::register_class<MySingleton>();
-
-		_my_singleton = memnew(MySingleton);
-		Engine::get_singleton()->register_singleton("MySingleton", MySingleton::get_singleton());
 	}
 }
 
@@ -29,8 +19,6 @@ void voxel_godot_terminate(ModuleInitializationLevel p_level)
 {
 	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE)
 	{
-		Engine::get_singleton()->unregister_singleton("MySingleton");
-		memdelete(_my_singleton);
 	}
 }
 
