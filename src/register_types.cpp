@@ -13,7 +13,7 @@ using namespace godot;
 
 static MySingleton *_my_singleton;
 
-void gdextension_initialize(ModuleInitializationLevel p_level)
+void voxel_godot_initialize(ModuleInitializationLevel p_level)
 {
 	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE)
 	{
@@ -25,7 +25,7 @@ void gdextension_initialize(ModuleInitializationLevel p_level)
 	}
 }
 
-void gdextension_terminate(ModuleInitializationLevel p_level)
+void voxel_godot_terminate(ModuleInitializationLevel p_level)
 {
 	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE)
 	{
@@ -40,8 +40,8 @@ extern "C"
 	{
 		godot::GDExtensionBinding::InitObject init_obj(p_get_proc_address, p_library, r_initialization);
 
-		init_obj.register_initializer(gdextension_initialize);
-		init_obj.register_terminator(gdextension_terminate);
+		init_obj.register_initializer(voxel_godot_initialize);
+		init_obj.register_terminator(voxel_godot_terminate);
 		init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
 
 		return init_obj.init();

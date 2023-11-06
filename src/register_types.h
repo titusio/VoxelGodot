@@ -4,5 +4,5 @@
 
 using namespace godot;
 
-void gdextension_initialize(ModuleInitializationLevel p_level);
-void gdextension_terminate(ModuleInitializationLevel p_level);
+void voxel_godot_initialize(ModuleInitializationLevel p_level);
+void voxel_godot_terminate(ModuleInitializationLevel p_level);
