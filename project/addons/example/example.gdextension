@@ -14,3 +14,9 @@ linux.debug.arm64 = "bin/libexample.linux.debug.arm64.so"
 linux.release.arm64 = "bin/libexample.linux.release.arm64.so"
 linux.debug.rv64 = "bin/libexample.linux.debug.rv64.so"
 linux.release.rv64 = "bin/libexample.linux.release.rv64.so"
+
+
+[configuration]
+
+entry_symbol = "example_library_init"
+compatibility_minimum = 4.1
