@@ -1,22 +1,22 @@
 [configuration]
 
-entry_symbol = "gdextension_init"
+entry_symbol = "voxel_godot_init"
 
 [libraries]
 
-macos.debug = "bin/libexample.macos.debug.framework"
-macos.release = "bin/libexample.macos.release.framework"
-windows.debug.x86_64 = "bin/libexample.windows.debug.x86_64.dll"
-windows.release.x86_64 = "bin/libexample.windows.release.x86_64.dll"
-linux.debug.x86_64 = "bin/libexample.linux.debug.x86_64.so"
-linux.release.x86_64 = "bin/libexample.linux.release.x86_64.so"
-linux.debug.arm64 = "bin/libexample.linux.debug.arm64.so"
-linux.release.arm64 = "bin/libexample.linux.release.arm64.so"
-linux.debug.rv64 = "bin/libexample.linux.debug.rv64.so"
-linux.release.rv64 = "bin/libexample.linux.release.rv64.so"
+macos.debug = "bin/libvoxel_godot.macos.debug.framework"
+macos.release = "bin/libvoxel_godot.macos.release.framework"
+windows.debug.x86_64 = "bin/libvoxel_godot.windows.debug.x86_64.dll"
+windows.release.x86_64 = "bin/libvoxel_godot.windows.release.x86_64.dll"
+linux.debug.x86_64 = "bin/libvoxel_godot.linux.debug.x86_64.so"
+linux.release.x86_64 = "bin/libvoxel_godot.linux.release.x86_64.so"
+linux.debug.arm64 = "bin/libvoxel_godot.linux.debug.arm64.so"
+linux.release.arm64 = "bin/libvoxel_godot.linux.release.arm64.so"
+linux.debug.rv64 = "bin/libvoxel_godot.linux.debug.rv64.so"
+linux.release.rv64 = "bin/libvoxel_godot.linux.release.rv64.so"
 
 
 [configuration]
 
-entry_symbol = "example_library_init"
+entry_symbol = "voxel_godot_init"
 compatibility_minimum = 4.1
