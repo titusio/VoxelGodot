@@ -12,3 +12,7 @@
 
 # Editors
 .vscode/
+
+# Build
+.cache
+compile_commands.json
