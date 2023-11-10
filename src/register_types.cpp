@@ -7,6 +7,8 @@
 #include <godot_cpp/godot.hpp>
 
 #include "voxel.hpp"
+#include "voxel_world_instance.hpp"
+#include "voxel_world.hpp"
 
 using namespace godot;
 
@@ -15,6 +17,8 @@ void voxel_godot_initialize(ModuleInitializationLevel p_level)
 	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE)
 	{
 		ClassDB::register_class<Voxel>();
+		ClassDB::register_class<VoxelWorld>();
+		ClassDB::register_class<VoxelWorldInstance>();
 	}
 }
 
