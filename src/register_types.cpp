@@ -10,15 +10,23 @@
 #include "voxel_world_instance.hpp"
 #include "voxel_world.hpp"
 
+// Editor Plugins
+#include "voxel_world_instance_editor_plugin.hpp"
+
 using namespace godot;
 
 void voxel_godot_initialize(ModuleInitializationLevel p_level)
 {
-	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE)
+	if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR)
 	{
 		ClassDB::register_class<Voxel>();
 		ClassDB::register_class<VoxelWorld>();
 		ClassDB::register_class<VoxelWorldInstance>();
+
+		// Editor Plugins
+		ClassDB::register_class<VoxelWorldInstanceEditorPlugin>();
+		ClassDB::register_class<VoxelWorldInstanceEditor>();
+		EditorPlugins::add_by_type<VoxelWorldInstanceEditorPlugin>();
 	}
 }
 
@@ -37,7 +45,7 @@ extern "C"
 
 		init_obj.register_initializer(voxel_godot_initialize);
 		init_obj.register_terminator(voxel_godot_terminate);
-		init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
+		init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_EDITOR);
 
 		return init_obj.init();
 	}

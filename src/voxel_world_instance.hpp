@@ -20,6 +20,9 @@ namespace godot
         Ref<VoxelWorld> get_voxel_world() const;
         void set_voxel_world(Ref<VoxelWorld> p_world);
 
+        void generate();
+        void clear();
+
     protected:
         static void _bind_methods();
     };

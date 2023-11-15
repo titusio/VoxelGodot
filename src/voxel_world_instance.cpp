@@ -1,5 +1,7 @@
 #include "voxel_world_instance.hpp"
 
+#include <godot_cpp/variant/utility_functions.hpp>
+
 using namespace godot;
 
 VoxelWorldInstance::VoxelWorldInstance()
@@ -26,4 +28,14 @@ Ref<VoxelWorld> VoxelWorldInstance::get_voxel_world() const
 void VoxelWorldInstance::set_voxel_world(Ref<VoxelWorld> p_world)
 {
     world = p_world;
+}
+
+void VoxelWorldInstance::generate()
+{
+    UtilityFunctions::print("VoxelWorldInstance::generate()");
+}
+
+void VoxelWorldInstance::clear()
+{
+    UtilityFunctions::print("VoxelWorldInstance::clear()");
 }

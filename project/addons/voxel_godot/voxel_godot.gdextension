@@ -1,6 +1,8 @@
 [configuration]
 
 entry_symbol = "voxel_godot_init"
+compatibility_minimum = 4.1
+reloadable = true
 
 [libraries]
 
@@ -15,8 +17,5 @@ linux.release.arm64 = "bin/libvoxel_godot.linux.release.arm64.so"
 linux.debug.rv64 = "bin/libvoxel_godot.linux.debug.rv64.so"
 linux.release.rv64 = "bin/libvoxel_godot.linux.release.rv64.so"
 
-
-[configuration]
-
-entry_symbol = "voxel_godot_init"
-compatibility_minimum = 4.1
+[icons]
+VoxelWorldInstance = "res://addons/voxel_godot/icons/voxel_world_instance_icon.svg"
