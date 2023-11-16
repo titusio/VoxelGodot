@@ -2,6 +2,8 @@
 #define VOXEL_WORLD_INSTANCE_HPP
 
 #include <godot_cpp/classes/node3d.hpp>
+#include <godot_cpp/variant/dictionary.hpp>
+
 #include "voxel_world.hpp"
 
 namespace godot
@@ -30,6 +32,9 @@ namespace godot
 
     public:
         Ref<VoxelWorld> world;
+
+    private:
+        Dictionary chunks;
 
     public:
         VoxelWorldInstance();

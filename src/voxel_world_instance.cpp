@@ -5,11 +5,15 @@
 #include <godot_cpp/variant/packed_int32_array.hpp>
 #include <godot_cpp/classes/array_mesh.hpp>
 #include <godot_cpp/variant/array.hpp>
+#include <godot_cpp/classes/rendering_server.hpp>
+#include <godot_cpp/classes/world3d.hpp>
+#include <godot_cpp/classes/mesh_instance3d.hpp>
 
 using namespace godot;
 
 VoxelWorldInstance::VoxelWorldInstance()
 {
+    chunks = Dictionary();
 }
 
 VoxelWorldInstance::~VoxelWorldInstance()
@@ -38,7 +42,7 @@ void VoxelWorldInstance::generate()
 {
     UtilityFunctions::print("start generating");
     const int CHUNK_SIZE = 16;
-    const float voxel_size = 0.1f;
+    const float voxel_size = 1.0f;
     const Color color = Color("#CCD1D1");
 
     PackedVector3Array vertices = PackedVector3Array();
@@ -46,14 +50,14 @@ void VoxelWorldInstance::generate()
     PackedColorArray colors = PackedColorArray();
     PackedInt32Array indices = PackedInt32Array();
 
-    const Vector3 a = Vector3(0.0, 1.0, 0.0);
-    const Vector3 b = Vector3(1.0, 1.0, 0.0);
-    const Vector3 c = Vector3(1.0, 0.0, 0.0);
-    const Vector3 d = Vector3(0.0, 0.0, 0.0);
-    const Vector3 e = Vector3(0.0, 1.0, 1.0);
-    const Vector3 f = Vector3(1.0, 1.0, 1.0);
-    const Vector3 g = Vector3(1.0, 0.0, 1.0);
-    const Vector3 h = Vector3(0.0, 0.0, 1.0);
+    const Vector3 a = Vector3(0.0, 1.0, 0.0) * voxel_size;
+    const Vector3 b = Vector3(1.0, 1.0, 0.0) * voxel_size;
+    const Vector3 c = Vector3(1.0, 0.0, 0.0) * voxel_size;
+    const Vector3 d = Vector3(0.0, 0.0, 0.0) * voxel_size;
+    const Vector3 e = Vector3(0.0, 1.0, 1.0) * voxel_size;
+    const Vector3 f = Vector3(1.0, 1.0, 1.0) * voxel_size;
+    const Vector3 g = Vector3(1.0, 0.0, 1.0) * voxel_size;
+    const Vector3 h = Vector3(0.0, 0.0, 1.0) * voxel_size;
 
     const Vector3 north = Vector3(0.0, 0.0, -1.0);
     const Vector3 south = Vector3(0.0, 0.0, 1.0);
@@ -73,10 +77,10 @@ void VoxelWorldInstance::generate()
                 Vector3 position = Vector3(x, y, z) * voxel_size;
 
                 // North Face
-                vertices.append(a); // 0
-                vertices.append(b); // 1
-                vertices.append(f); // 2
-                vertices.append(e); // 3
+                vertices.append(position + b); // 0
+                vertices.append(position + a); // 1
+                vertices.append(position + d); // 2
+                vertices.append(position + c); // 3
                 indices.append(index + 0);
                 indices.append(index + 1);
                 indices.append(index + 2);
@@ -91,10 +95,10 @@ void VoxelWorldInstance::generate()
                 }
 
                 // south face
-                vertices.append(e); // 0
-                vertices.append(f); // 1
-                vertices.append(g); // 2
-                vertices.append(h); // 3
+                vertices.append(position + e); // 0
+                vertices.append(position + f); // 1
+                vertices.append(position + g); // 2
+                vertices.append(position + h); // 3
                 indices.append(index + 0);
                 indices.append(index + 1);
                 indices.append(index + 2);
@@ -109,10 +113,10 @@ void VoxelWorldInstance::generate()
                 }
 
                 // top
-                vertices.append(a); // 0
-                vertices.append(b); // 1
-                vertices.append(f); // 2
-                vertices.append(e); // 3
+                vertices.append(position + a); // 0
+                vertices.append(position + b); // 1
+                vertices.append(position + f); // 2
+                vertices.append(position + e); // 3
                 indices.append(index + 0);
                 indices.append(index + 1);
                 indices.append(index + 2);
@@ -127,10 +131,10 @@ void VoxelWorldInstance::generate()
                 }
 
                 // bottom
-                vertices.append(h); // 0
-                vertices.append(g); // 1
-                vertices.append(c); // 2
-                vertices.append(d); // 3
+                vertices.append(position + h); // 0
+                vertices.append(position + g); // 1
+                vertices.append(position + c); // 2
+                vertices.append(position + d); // 3
                 indices.append(index + 0);
                 indices.append(index + 1);
                 indices.append(index + 2);
@@ -145,10 +149,10 @@ void VoxelWorldInstance::generate()
                 }
 
                 // west
-                vertices.append(a); // 0
-                vertices.append(e); // 1
-                vertices.append(h); // 2
-                vertices.append(d); // 3
+                vertices.append(position + a); // 0
+                vertices.append(position + e); // 1
+                vertices.append(position + h); // 2
+                vertices.append(position + d); // 3
                 indices.append(index + 0);
                 indices.append(index + 1);
                 indices.append(index + 2);
@@ -163,10 +167,10 @@ void VoxelWorldInstance::generate()
                 }
 
                 // east
-                vertices.append(f); // 0
-                vertices.append(b); // 1
-                vertices.append(c); // 2
-                vertices.append(g); // 3
+                vertices.append(position + f); // 0
+                vertices.append(position + b); // 1
+                vertices.append(position + c); // 2
+                vertices.append(position + g); // 3
                 indices.append(index + 0);
                 indices.append(index + 1);
                 indices.append(index + 2);
@@ -183,7 +187,7 @@ void VoxelWorldInstance::generate()
         }
     }
 
-    Ref<ArrayMesh> mesh = memnew(ArrayMesh);
+    ArrayMesh *mesh = memnew(ArrayMesh);
     Array surface_arrays = Array();
     surface_arrays.resize(Mesh::ARRAY_MAX);
     surface_arrays[Mesh::ARRAY_VERTEX] = vertices;
@@ -193,8 +197,18 @@ void VoxelWorldInstance::generate()
     mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, surface_arrays);
     UtilityFunctions::print(index);
     UtilityFunctions::print("end generating");
+
+    RenderingServer *rs = RenderingServer::get_singleton();
+    RID instance = rs->instance_create();
+    rs->instance_set_base(instance, mesh->get_rid());
+    rs->instance_set_transform(instance, Transform3D(Basis(), Vector3(0.0, 0.0, 0.0)));
+    rs->instance_set_scenario(instance, get_world_3d()->get_scenario());
+
+    chunks[Vector3i(0, 0, 0)] = instance;
 }
 
 void VoxelWorldInstance::clear()
 {
+    RenderingServer *rs = RenderingServer::get_singleton();
+    rs->free_rid(chunks[Vector3i(0, 0, 0)]);
 }
