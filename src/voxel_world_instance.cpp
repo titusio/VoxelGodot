@@ -8,16 +8,19 @@
 #include <godot_cpp/classes/rendering_server.hpp>
 #include <godot_cpp/classes/world3d.hpp>
 #include <godot_cpp/classes/mesh_instance3d.hpp>
+#include <godot_cpp/variant/rid.hpp>
 
 using namespace godot;
 
 VoxelWorldInstance::VoxelWorldInstance()
 {
-    chunks = Dictionary();
+    chunk_instances = Dictionary();
+    chunk_meshes = Dictionary();
 }
 
 VoxelWorldInstance::~VoxelWorldInstance()
 {
+    clear();
 }
 
 void VoxelWorldInstance::_bind_methods()
@@ -40,7 +43,6 @@ void VoxelWorldInstance::set_voxel_world(Ref<VoxelWorld> p_world)
 
 void VoxelWorldInstance::generate()
 {
-    UtilityFunctions::print("start generating");
     const int CHUNK_SIZE = 16;
     const float voxel_size = 1.0f;
     const Color color = Color("#CCD1D1");
@@ -187,7 +189,7 @@ void VoxelWorldInstance::generate()
         }
     }
 
-    ArrayMesh *mesh = memnew(ArrayMesh);
+    Ref<ArrayMesh> mesh = memnew(ArrayMesh);
     Array surface_arrays = Array();
     surface_arrays.resize(Mesh::ARRAY_MAX);
     surface_arrays[Mesh::ARRAY_VERTEX] = vertices;
@@ -195,8 +197,6 @@ void VoxelWorldInstance::generate()
     surface_arrays[Mesh::ARRAY_NORMAL] = normals;
     surface_arrays[Mesh::ARRAY_COLOR] = colors;
     mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, surface_arrays);
-    UtilityFunctions::print(index);
-    UtilityFunctions::print("end generating");
 
     RenderingServer *rs = RenderingServer::get_singleton();
     RID instance = rs->instance_create();
@@ -204,11 +204,21 @@ void VoxelWorldInstance::generate()
     rs->instance_set_transform(instance, Transform3D(Basis(), Vector3(0.0, 0.0, 0.0)));
     rs->instance_set_scenario(instance, get_world_3d()->get_scenario());
 
-    chunks[Vector3i(0, 0, 0)] = instance;
+    chunk_meshes[Vector3i(0, 0, 0)] = mesh;
+    chunk_instances[Vector3i(0, 0, 0)] = instance;
 }
 
 void VoxelWorldInstance::clear()
 {
+    Array instance_keys = chunk_instances.keys();
+
     RenderingServer *rs = RenderingServer::get_singleton();
-    rs->free_rid(chunks[Vector3i(0, 0, 0)]);
+
+    for (int i = 0; i < instance_keys.size(); i++)
+    {
+        rs->free_rid(instance_keys[i]);
+    }
+
+    chunk_instances.clear();
+    chunk_meshes.clear();
 }

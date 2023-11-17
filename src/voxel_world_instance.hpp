@@ -34,7 +34,8 @@ namespace godot
         Ref<VoxelWorld> world;
 
     private:
-        Dictionary chunks;
+        Dictionary chunk_instances;
+        Dictionary chunk_meshes;
 
     public:
         VoxelWorldInstance();
