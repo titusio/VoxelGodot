@@ -47,6 +47,9 @@ namespace godot
         void generate();
         void clear();
 
+    private:
+        void generate_chunk(Vector3i p_position);
+
     protected:
         static void _bind_methods();
     };

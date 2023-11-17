@@ -43,8 +43,22 @@ void VoxelWorldInstance::set_voxel_world(Ref<VoxelWorld> p_world)
 
 void VoxelWorldInstance::generate()
 {
+    for (int x = 0; x < 3; x++)
+    {
+        for (int y = 0; y < 1; y++)
+        {
+            for (int z = 0; z < 3; z++)
+            {
+                generate_chunk(Vector3i(x, y, z));
+            }
+        }
+    }
+}
+
+void VoxelWorldInstance::generate_chunk(Vector3i p_position)
+{
     const int CHUNK_SIZE = 16;
-    const float voxel_size = 1.0f;
+    const float voxel_size = 0.1f;
     const Color color = Color("#CCD1D1");
 
     PackedVector3Array vertices = PackedVector3Array();
@@ -198,14 +212,16 @@ void VoxelWorldInstance::generate()
     surface_arrays[Mesh::ARRAY_COLOR] = colors;
     mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, surface_arrays);
 
+    Vector3 world_position = p_position * CHUNK_SIZE * voxel_size;
+
     RenderingServer *rs = RenderingServer::get_singleton();
     RID instance = rs->instance_create();
     rs->instance_set_base(instance, mesh->get_rid());
-    rs->instance_set_transform(instance, Transform3D(Basis(), Vector3(0.0, 0.0, 0.0)));
+    rs->instance_set_transform(instance, Transform3D(Basis(), world_position));
     rs->instance_set_scenario(instance, get_world_3d()->get_scenario());
 
-    chunk_meshes[Vector3i(0, 0, 0)] = mesh;
-    chunk_instances[Vector3i(0, 0, 0)] = instance;
+    chunk_meshes[p_position] = mesh;
+    chunk_instances[p_position] = instance;
 }
 
 void VoxelWorldInstance::clear()
