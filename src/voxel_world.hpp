@@ -10,8 +10,14 @@ namespace godot
         GDCLASS(VoxelWorld, Resource)
 
     public:
+        bool colliding;
+
+    public:
         VoxelWorld();
         ~VoxelWorld();
+
+        void set_colliding(bool p_colliding);
+        bool is_colliding() const;
 
     protected:
         static void _bind_methods();

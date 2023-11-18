@@ -43,6 +43,12 @@ void VoxelWorldInstance::set_voxel_world(Ref<VoxelWorld> p_world)
 
 void VoxelWorldInstance::generate()
 {
+    if (world == nullptr)
+    {
+        UtilityFunctions::printerr("VoxelWorldInstance::generate(): world is null ", __FILE__, " ", __LINE__, " ", __FUNCTION__);
+        return;
+    }
+
     for (int x = 0; x < 3; x++)
     {
         for (int y = 0; y < 1; y++)
@@ -57,6 +63,8 @@ void VoxelWorldInstance::generate()
 
 void VoxelWorldInstance::generate_chunk(Vector3i p_position)
 {
+    ERR_FAIL_NULL(world);
+
     const int CHUNK_SIZE = 16;
     const float voxel_size = 0.1f;
     const Color color = Color("#CCD1D1");
@@ -65,6 +73,8 @@ void VoxelWorldInstance::generate_chunk(Vector3i p_position)
     PackedVector3Array normals = PackedVector3Array();
     PackedColorArray colors = PackedColorArray();
     PackedInt32Array indices = PackedInt32Array();
+
+    PackedVector3Array collision_points = PackedVector3Array();
 
     const Vector3 a = Vector3(0.0, 1.0, 0.0) * voxel_size;
     const Vector3 b = Vector3(1.0, 1.0, 0.0) * voxel_size;
@@ -198,6 +208,52 @@ void VoxelWorldInstance::generate_chunk(Vector3i p_position)
                 {
                     normals.append(east);
                     colors.append(color);
+                }
+
+                if (world->is_colliding())
+                {
+                    // north
+                    collision_points.append(b);
+                    collision_points.append(a);
+                    collision_points.append(d);
+                    collision_points.append(b);
+                    collision_points.append(d);
+                    collision_points.append(c);
+                    // south
+                    collision_points.append(e);
+                    collision_points.append(f);
+                    collision_points.append(g);
+                    collision_points.append(e);
+                    collision_points.append(g);
+                    collision_points.append(h);
+                    // west
+                    collision_points.append(a);
+                    collision_points.append(e);
+                    collision_points.append(h);
+                    collision_points.append(a);
+                    collision_points.append(h);
+                    collision_points.append(d);
+                    // east
+                    collision_points.append(f);
+                    collision_points.append(b);
+                    collision_points.append(c);
+                    collision_points.append(f);
+                    collision_points.append(c);
+                    collision_points.append(g);
+                    // top
+                    collision_points.append(a);
+                    collision_points.append(b);
+                    collision_points.append(f);
+                    collision_points.append(a);
+                    collision_points.append(f);
+                    collision_points.append(e);
+                    // bottom
+                    collision_points.append(h);
+                    collision_points.append(g);
+                    collision_points.append(c);
+                    collision_points.append(h);
+                    collision_points.append(c);
+                    collision_points.append(d);
                 }
             }
         }
