@@ -39,12 +39,47 @@ VoxelSetEditor::VoxelSetEditor()
 	// create ItemList
 	item_list = memnew(ItemList);
 	item_list->set_v_size_flags(SIZE_EXPAND_FILL);
+	item_list->connect("item_selected", callable_mp(this, &VoxelSetEditor::_on_item_selected));
 	left_panel->add_child(item_list);
 
-	// add 2nd panel
-	middle_panel = memnew(Control);
-	middle_panel->set_h_size_flags(SIZE_EXPAND_FILL);
-	hbox_container->add_child(middle_panel);
+	// properties panel
+	properties_panel = memnew(VBoxContainer);
+	properties_panel->set_h_size_flags(SIZE_EXPAND_FILL);
+	hbox_container->add_child(properties_panel);
+
+	// name property
+	name_container = memnew(HBoxContainer);
+	properties_panel->add_child(name_container);
+	name_label = memnew(Label);
+	name_label->set_text("Voxel Name");
+	name_label->set_h_size_flags(SIZE_EXPAND_FILL);
+	name_container->add_child(name_label);
+	name_line_edit = memnew(LineEdit);
+	name_line_edit->set_h_size_flags(SIZE_EXPAND_FILL);
+	name_container->add_child(name_line_edit);
+
+	// color property
+	color_container = memnew(HBoxContainer);
+	properties_panel->add_child(color_container);
+	color_label = memnew(Label);
+	color_label->set_text("Voxel Color");
+	color_label->set_h_size_flags(SIZE_EXPAND_FILL);
+	color_container->add_child(color_label);
+	color_picker_button = memnew(ColorPickerButton);
+	color_picker_button->set_h_size_flags(SIZE_EXPAND_FILL);
+	color_picker_button->set_pick_color(Color(1, 1, 1, 1));
+	color_container->add_child(color_picker_button);
+
+	// is_solid property
+	is_solid_check = memnew(CheckButton);
+	is_solid_check->set_text("Is Solid");
+	is_solid_check->set_h_size_flags(SIZE_EXPAND_FILL);
+	properties_panel->add_child(is_solid_check);
+
+	// properties signals
+	name_line_edit->connect("text_changed", callable_mp(this, &VoxelSetEditor::_voxel_name_changed));
+	color_picker_button->connect("color_changed", callable_mp(this, &VoxelSetEditor::_voxel_color_changed));
+	is_solid_check->connect("toggled", callable_mp(this, &VoxelSetEditor::_voxel_is_solid_changed));
 
 	// add 3rd panel
 	right_panel = memnew(Control);
@@ -81,11 +116,45 @@ void VoxelSetEditor::_init_items()
 	}
 }
 
+void VoxelSetEditor::_ensure_selection()
+{
+	if (voxel_set == nullptr)
+	{
+		return;
+	}
+
+	if (item_list->get_item_count() == 0)
+		properties_panel->hide();
+	else 
+		properties_panel->show();
+
+	if (!item_list->is_anything_selected() && item_list->get_item_count() != 0)
+	{
+		item_list->select(0);
+		// because the signal is not emitted when selecting the item manually
+		_on_item_selected(0);
+	}
+}
+
+void VoxelSetEditor::_update_items()
+{
+	if (voxel_set == nullptr || !item_list->is_anything_selected())
+		return;
+	
+	if (item_list->get_item_count() == 0) return;
+
+	int selected_item = item_list->get_selected_items()[0];
+	_init_items();
+	item_list->select(selected_item);
+}
+
 void VoxelSetEditor::_add_item()
 {
 	ERR_FAIL_NULL_MSG(voxel_set, "No VoxelSet Selected");
 	item_list->add_item("Item " + String::num(item_list->get_item_count() + 1));
 	voxel_set->voxels.append(memnew(Voxel));
+	_ensure_selection();
+	_update_items();
 }
 
 void VoxelSetEditor::_remove_item()
@@ -104,11 +173,86 @@ void VoxelSetEditor::_remove_item()
 		voxel_set->voxels.remove_at(selected[i]);
 	}
 
+	_update_items();
+	_ensure_selection();
 }
 
 void VoxelSetEditor::_edit(VoxelSet *p_voxel_set)
 {
 	voxel_set = p_voxel_set;
+}
+
+void VoxelSetEditor::_on_item_selected(int p_index)
+{
+	if (voxel_set == nullptr)
+	{
+		return;
+	}
+
+	Voxel *voxel = Object::cast_to<Voxel>(voxel_set->voxels[p_index]);
+	if (voxel == nullptr)
+	{
+		return;
+	}
+
+	name_line_edit->set_text(voxel->get_name());
+	color_picker_button->set_pick_color(voxel->get_color());
+	is_solid_check->set_pressed(voxel->get_is_empty());
+
+	_ensure_selection();
+}
+
+void VoxelSetEditor::_voxel_name_changed(String p_name) 
+{
+	if (voxel_set == nullptr || !item_list->is_anything_selected())
+		return;
+
+	Array selected_items = item_list->get_selected_items();
+	for (int i = 0; i < selected_items.size(); i++)
+	{
+		Voxel *voxel = Object::cast_to<Voxel>(voxel_set->voxels[selected_items[i]]);
+		if (voxel == nullptr)
+			continue;
+		voxel->set_name(p_name);
+
+		UtilityFunctions::print("Voxel Name Changed: " + p_name);
+	}
+
+	_update_items();
+}
+
+void VoxelSetEditor::_voxel_is_solid_changed(bool p_is_solid)
+{
+	if (voxel_set == nullptr || !item_list->is_anything_selected())
+		return;
+
+	Array selected_items = item_list->get_selected_items();
+	for (int i = 0; i < selected_items.size(); i++)
+	{
+		Voxel *voxel = Object::cast_to<Voxel>(voxel_set->voxels[selected_items[i]]);
+		if (voxel == nullptr)
+			continue;
+		voxel->set_is_empty(p_is_solid);
+	}
+
+	_update_items();
+}
+
+void VoxelSetEditor::_voxel_color_changed(Color p_color)
+{
+	if (voxel_set == nullptr || !item_list->is_anything_selected())
+		return;
+
+	Array selected_items = item_list->get_selected_items();
+	for (int i = 0; i < selected_items.size(); i++)
+	{
+		Voxel *voxel = Object::cast_to<Voxel>(voxel_set->voxels[selected_items[i]]);
+		if (voxel == nullptr)
+			continue;
+		voxel->set_color(p_color);
+	}
+
+	_update_items();
 }
 
 void VoxelSetEditor::_bind_methods()
@@ -134,6 +278,7 @@ void VoxelSetEditorPlugin::_edit(Object *p_object)
 {
 	voxel_set_editor->_edit(Object::cast_to<VoxelSet>(p_object));
 	voxel_set_editor->_init_items();
+	voxel_set_editor->_ensure_selection();
 }
 
 bool VoxelSetEditorPlugin::_handles(Object *p_object) const

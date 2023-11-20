@@ -7,6 +7,10 @@
 #include <godot_cpp/classes/v_box_container.hpp>
 #include <godot_cpp/classes/item_list.hpp>
 #include <godot_cpp/classes/button.hpp>
+#include <godot_cpp/classes/label.hpp>
+#include <godot_cpp/classes/line_edit.hpp>
+#include <godot_cpp/classes/color_picker_button.hpp>
+#include <godot_cpp/classes/check_button.hpp>
 
 #include "voxel_set.hpp"
 
@@ -30,7 +34,16 @@ namespace godot
 		Button *add_button;
 		Button *remove_button;
 
-		Control *middle_panel;
+		// properties panel
+		VBoxContainer *properties_panel;
+		HBoxContainer *name_container;
+		Label *name_label;
+		LineEdit *name_line_edit;
+		HBoxContainer *color_container;
+		Label *color_label;
+		ColorPickerButton *color_picker_button;
+		CheckButton *is_solid_check;
+
 		Control *right_panel;
 	
 	public:
@@ -39,9 +52,15 @@ namespace godot
 	
 	private:
 		void _init_items();
+		void _ensure_selection();
+		void _update_items();
 		void _add_item();
 		void _remove_item();
 		void _edit(VoxelSet *p_voxel_set);
+		void _on_item_selected(int p_index);
+		void _voxel_name_changed(String p_name);
+		void _voxel_is_solid_changed(bool p_is_solid);
+		void _voxel_color_changed(Color p_color);
 	
 	protected:
 		static void _bind_methods();
