@@ -1,6 +1,7 @@
 #include "voxel_set_editor_plugin.hpp"
 
 #include <godot_cpp/variant/utility_functions.hpp>
+#include <godot_cpp/classes/camera3d.hpp>
 
 using namespace godot;
 
@@ -82,9 +83,21 @@ VoxelSetEditor::VoxelSetEditor()
 	is_solid_check->connect("toggled", callable_mp(this, &VoxelSetEditor::_voxel_is_solid_changed));
 
 	// add 3rd panel
-	right_panel = memnew(Control);
-	right_panel->set_h_size_flags(SIZE_EXPAND_FILL);
-	hbox_container->add_child(right_panel);
+	preview_container = memnew(Control);
+	preview_container->set_h_size_flags(SIZE_EXPAND_FILL);
+	hbox_container->add_child(preview_container);
+
+	preview_sub_viewport_container = memnew(SubViewportContainer);
+	preview_sub_viewport_container->set_anchors_preset(Control::PRESET_FULL_RECT);
+	preview_sub_viewport_container->set_stretch(true);
+	preview_container->add_child(preview_sub_viewport_container);
+
+	preview_sub_viewport = memnew(SubViewport);
+	preview_sub_viewport_container->add_child(preview_sub_viewport);
+	Camera3D *camera = memnew(Camera3D);
+	preview_sub_viewport->add_child(camera);
+	camera->set_global_position(Vector3(0, 0, 5));
+	camera->set_rotation(Vector3(0, 3.14f / -2.0f, 0));
 }
 
 VoxelSetEditor::~VoxelSetEditor()

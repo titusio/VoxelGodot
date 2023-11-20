@@ -11,6 +11,8 @@
 #include <godot_cpp/classes/line_edit.hpp>
 #include <godot_cpp/classes/color_picker_button.hpp>
 #include <godot_cpp/classes/check_button.hpp>
+#include <godot_cpp/classes/sub_viewport.hpp>
+#include <godot_cpp/classes/sub_viewport_container.hpp>
 
 #include "voxel_set.hpp"
 
@@ -44,7 +46,10 @@ namespace godot
 		ColorPickerButton *color_picker_button;
 		CheckButton *is_solid_check;
 
-		Control *right_panel;
+		Control *preview_container;
+		SubViewportContainer *preview_sub_viewport_container;
+		SubViewport *preview_sub_viewport;
+
 	
 	public:
 		VoxelSetEditor();
