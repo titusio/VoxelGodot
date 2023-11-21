@@ -31,6 +31,9 @@ namespace godot
 
     protected:
         static void _bind_methods();
+		bool _property_can_revert(const StringName &p_name) const;
+        bool _property_get_revert(const StringName &p_name, Variant &r_property) const;
+
 	};
 
 } // namespace godot
