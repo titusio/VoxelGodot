@@ -31,7 +31,31 @@ void VoxelSet::set_voxels(Array p_voxels)
 
 void VoxelSet::_bind_methods()
 {
-    ClassDB::bind_method(D_METHOD("get_voxels"), &VoxelSet::get_voxels);
-    ClassDB::bind_method(D_METHOD("set_voxels", "p_voxels"), &VoxelSet::set_voxels);
-    ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "voxels", PROPERTY_HINT_ARRAY_TYPE, "Voxel"), "set_voxels", "get_voxels");
+}
+
+void VoxelSet::_get_property_list(List<PropertyInfo> *p_list) const
+{
+	p_list->push_back(PropertyInfo(Variant::ARRAY, "voxels", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR));
+}
+
+bool VoxelSet::_set(const StringName &p_name, const Variant &p_value)
+{
+	if (p_name == StringName("voxels"))
+	{
+		set_voxels(p_value);
+		return true;
+	}
+
+	return false;
+}
+
+bool VoxelSet::_get(const StringName &p_name, Variant &r_ret) const
+{
+	if (p_name == StringName("voxels"))
+	{
+		r_ret = get_voxels();
+		return true;
+	}
+
+	return false;
 }

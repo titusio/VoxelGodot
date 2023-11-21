@@ -24,7 +24,10 @@ namespace godot
 
     protected:
         static void _bind_methods();
+        void _get_property_list(List<PropertyInfo> *p_list) const;
+		bool _set(const StringName &p_name, const Variant &p_value);
+        bool _get(const StringName &p_name, Variant &r_ret) const;
     };
 }
 
-#endif // VOXEL_SET_HPP
+#endif // VOXEL_tET_HPP
