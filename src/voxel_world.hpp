@@ -14,6 +14,7 @@ namespace godot
 
     public:
         Ref<VoxelSet> voxel_set;
+		float voxel_size;
         int chunk_size;
         bool colliding;
 
@@ -23,6 +24,8 @@ namespace godot
 
         Ref<VoxelSet> get_voxel_set() const;
         void set_voxel_set(Ref<VoxelSet> p_voxel_set);
+		float get_voxel_size() const;
+		void set_voxel_size(float p_voxel_size);
         int get_chunk_size() const;
         void set_chunk_size(int p_chunk_size);
         void set_colliding(bool p_colliding);
