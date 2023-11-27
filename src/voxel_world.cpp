@@ -55,6 +55,11 @@ bool VoxelWorld::is_colliding() const
     return colliding;
 }
 
+ChunkData* VoxelWorld::get_chunk(Vector3i position)
+{
+	return nullptr;
+}
+
 void VoxelWorld::_bind_methods()
 {
     // voxel set

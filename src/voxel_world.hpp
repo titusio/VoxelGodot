@@ -31,6 +31,8 @@ namespace godot
         void set_colliding(bool p_colliding);
         bool is_colliding() const;
 
+		virtual ChunkData* get_chunk(Vector3i position);
+
     protected:
         static void _bind_methods();
         bool _property_can_revert(const StringName &p_name) const;
