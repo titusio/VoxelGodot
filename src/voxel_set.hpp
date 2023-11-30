@@ -14,13 +14,21 @@ namespace godot
 
     public:
         Array voxels;
+	
+	private:
+		int id_counter;
 
     public:
         VoxelSet();
         ~VoxelSet();
 
+		int get_new_id();
         Array get_voxels() const;
         void set_voxels(Array p_voxels);
+	
+	private:
+		int _get_id_counter() const;
+		void _set_id_counter(int p_id_counter);
 
     protected:
         static void _bind_methods();

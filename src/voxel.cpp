@@ -17,6 +17,16 @@ StringName Voxel::get_name() const
 	return name;
 }
 
+int Voxel::get_id() const
+{
+	return id;
+}
+
+void Voxel::set_id(int p_id)
+{
+	id = p_id;
+}
+
 void Voxel::set_name(StringName p_name)
 {
 	name = p_name;
@@ -44,6 +54,9 @@ void Voxel::set_is_empty(bool p_is_empty)
 
 void Voxel::_bind_methods()
 {
+	ClassDB::bind_method(D_METHOD("get_id"), &Voxel::get_id);
+	ClassDB::bind_method(D_METHOD("set_id", "id"), &Voxel::set_id);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "id"), "set_id", "get_id");
 	// name
 	ClassDB::bind_method(D_METHOD("set_name", "name"), &Voxel::set_name);
 	ClassDB::bind_method(D_METHOD("get_name"), &Voxel::get_name);

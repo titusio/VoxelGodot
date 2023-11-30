@@ -11,6 +11,7 @@ namespace godot
         GDCLASS(Voxel, Resource)
 
     private:
+		int id;
 		StringName name;
         Color color;
         bool is_empty;
@@ -18,6 +19,10 @@ namespace godot
     public:
         Voxel();
         ~Voxel();
+
+		// id
+		int get_id() const;
+		void set_id(int p_id);
 
 		//name
 		StringName get_name() const;

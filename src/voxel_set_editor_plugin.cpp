@@ -165,7 +165,11 @@ void VoxelSetEditor::_add_item()
 {
 	ERR_FAIL_NULL_MSG(voxel_set, "No VoxelSet Selected");
 	item_list->add_item("Item " + String::num(item_list->get_item_count() + 1));
-	voxel_set->voxels.append(memnew(Voxel));
+
+	Voxel* voxel = memnew(Voxel);
+	voxel->set_id(voxel_set->get_new_id());
+	voxel_set->voxels.append(voxel);
+
 	_ensure_selection();
 	_update_items();
 }
