@@ -1,4 +1,5 @@
 #include "voxel_world_instance.hpp"
+#include "godot_cpp/classes/ref.hpp"
 
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/variant/packed_vector3_array.hpp>
@@ -48,26 +49,33 @@ void VoxelWorldInstance::generate()
         UtilityFunctions::printerr("VoxelWorldInstance::generate(): world is null ", __FILE__, " ", __LINE__, " ", __FUNCTION__);
         return;
     }
-
-    for (int x = 0; x < 3; x++)
-    {
-        for (int y = 0; y < 1; y++)
-        {
-            for (int z = 0; z < 3; z++)
-            {
-                generate_chunk(Vector3i(x, y, z));
-            }
-        }
-    }
 }
 
-void VoxelWorldInstance::generate_chunk(Vector3i p_position)
+void VoxelWorldInstance::generate_chunk(ChunkData *p_chunk_data)
 {
+	ERR_FAIL_NULL(p_chunk_data);
     ERR_FAIL_NULL(world);
+	
+	PackedVector3Array collision_points = PackedVector3Array();
 
-    const int CHUNK_SIZE = 16;
-    const float voxel_size = 0.1f;
-    const Color color = Color("#CCD1D1");
+	Ref<ArrayMesh> mesh = generate_mesh(p_chunk_data, collision_points);
+
+    Vector3 world_position = Vector3() * world->get_voxel_size() * world->get_chunk_size();
+
+    RenderingServer *rs = RenderingServer::get_singleton();
+    RID instance = rs->instance_create();
+    rs->instance_set_base(instance, mesh->get_rid());
+    rs->instance_set_transform(instance, Transform3D(Basis(), world_position));
+    rs->instance_set_scenario(instance, get_world_3d()->get_scenario());
+
+    chunk_meshes[Vector3i()] = mesh;
+    chunk_instances[Vector3i()] = instance;
+}
+
+Ref<ArrayMesh> VoxelWorldInstance::generate_mesh(ChunkData* p_chunk_data, PackedVector3Array &p_collision_points)
+{
+    int CHUNK_SIZE = world->get_chunk_size();
+    const float voxel_size = world->get_voxel_size();
 
     PackedVector3Array vertices = PackedVector3Array();
     PackedVector3Array normals = PackedVector3Array();
@@ -101,6 +109,12 @@ void VoxelWorldInstance::generate_chunk(Vector3i p_position)
             for (int z = 0; z < CHUNK_SIZE; z++)
             {
                 Vector3 position = Vector3(x, y, z) * voxel_size;
+
+				Voxel* current_voxel = p_chunk_data->get_voxel(Vector3i(x, y, z));
+				if (current_voxel == nullptr)
+					continue;
+
+				Color color = current_voxel->get_color();
 
                 // North Face
                 vertices.append(position + b); // 0
@@ -268,16 +282,7 @@ void VoxelWorldInstance::generate_chunk(Vector3i p_position)
     surface_arrays[Mesh::ARRAY_COLOR] = colors;
     mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, surface_arrays);
 
-    Vector3 world_position = p_position * CHUNK_SIZE * voxel_size;
-
-    RenderingServer *rs = RenderingServer::get_singleton();
-    RID instance = rs->instance_create();
-    rs->instance_set_base(instance, mesh->get_rid());
-    rs->instance_set_transform(instance, Transform3D(Basis(), world_position));
-    rs->instance_set_scenario(instance, get_world_3d()->get_scenario());
-
-    chunk_meshes[p_position] = mesh;
-    chunk_instances[p_position] = instance;
+	return mesh;
 }
 
 void VoxelWorldInstance::clear()

@@ -3,6 +3,7 @@
 
 #include <godot_cpp/classes/node3d.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
+#include <godot_cpp/classes/array_mesh.hpp>
 
 #include "voxel_world.hpp"
 
@@ -48,7 +49,8 @@ namespace godot
         void clear();
 
     private:
-        void generate_chunk(Vector3i p_position);
+        void generate_chunk(ChunkData *p_chunk_data);
+		Ref<ArrayMesh> generate_mesh(ChunkData *p_chunk_data, PackedVector3Array &p_collision_points);
 
     protected:
         static void _bind_methods();
