@@ -51,6 +51,21 @@ void VoxelWorldInstance::generate()
     }
 }
 
+void VoxelWorldInstance::clear()
+{
+    Array instance_keys = chunk_instances.keys();
+
+    RenderingServer *rs = RenderingServer::get_singleton();
+
+    for (int i = 0; i < instance_keys.size(); i++)
+    {
+        rs->free_rid(instance_keys[i]);
+    }
+
+    chunk_instances.clear();
+    chunk_meshes.clear();
+}
+
 void VoxelWorldInstance::generate_chunk(ChunkData *p_chunk_data)
 {
 	ERR_FAIL_NULL(p_chunk_data);
@@ -285,17 +300,3 @@ Ref<ArrayMesh> VoxelWorldInstance::generate_mesh(ChunkData* p_chunk_data, Packed
 	return mesh;
 }
 
-void VoxelWorldInstance::clear()
-{
-    Array instance_keys = chunk_instances.keys();
-
-    RenderingServer *rs = RenderingServer::get_singleton();
-
-    for (int i = 0; i < instance_keys.size(); i++)
-    {
-        rs->free_rid(instance_keys[i]);
-    }
-
-    chunk_instances.clear();
-    chunk_meshes.clear();
-}
