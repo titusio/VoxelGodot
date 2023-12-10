@@ -12,6 +12,7 @@
 
 # Editors
 .vscode/
+.idea/
 
 # Build
 .cache
