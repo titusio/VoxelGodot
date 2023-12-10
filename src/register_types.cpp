@@ -12,6 +12,7 @@
 #include "voxel_world_instance.hpp"
 #include "voxel_world.hpp"
 #include "chunk_data.hpp"
+#include "world_loader.hpp"
 
 // Editor Plugins
 #include "voxel_world_instance_editor_plugin.hpp"
@@ -30,6 +31,7 @@ void voxel_godot_initialize(ModuleInitializationLevel p_level)
 		ClassDB::register_class<VoxelWorldInstance>();
 		ClassDB::register_class<ChunkInstance>();
 		ClassDB::register_class<ChunkData>();
+		ClassDB::register_class<WorldLoader>();
 
 		// Editor Plugins
 		// Voxel World Editor
