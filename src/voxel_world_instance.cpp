@@ -1,5 +1,6 @@
 #include "voxel_world_instance.hpp"
 #include "godot_cpp/classes/ref.hpp"
+#include "godot_cpp/core/error_macros.hpp"
 
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/variant/packed_vector3_array.hpp>
@@ -21,7 +22,6 @@ VoxelWorldInstance::VoxelWorldInstance()
 
 VoxelWorldInstance::~VoxelWorldInstance()
 {
-    clear();
 }
 
 void VoxelWorldInstance::_bind_methods()
@@ -42,49 +42,58 @@ void VoxelWorldInstance::set_voxel_world(Ref<VoxelWorld> p_world)
     world = p_world;
 }
 
-void VoxelWorldInstance::generate()
+void VoxelWorldInstance::load_chunk(Vector3 p_position)
 {
-    if (world == nullptr)
-    {
-        UtilityFunctions::printerr("VoxelWorldInstance::generate(): world is null ", __FILE__, " ", __LINE__, " ", __FUNCTION__);
-        return;
-    }
-}
+	ERR_FAIL_NULL_MSG(world, "VoxelWorldInstance::load_chunk() world is null");
+	ERR_FAIL_NULL_MSG(chunk_instances, "VoxelWorldInstance::load_chunk() chunk_instances is null");
 
-void VoxelWorldInstance::clear()
-{
-    Array instance_keys = chunk_instances.keys();
+	ChunkData* chunk_data = world->get_chunk(p_position);
+	if (chunk_data == nullptr)
+	{
+		UtilityFunctions::printerr("VoxelWorldInstance::load_chunk(): chunk_data is null ", __FILE__, " ", __LINE__, " ", __FUNCTION__);
+		return;
+	}
 
-    RenderingServer *rs = RenderingServer::get_singleton();
+	if (chunk_instances.has(p_position))
+	{
+		return;
+	}
 
-    for (int i = 0; i < instance_keys.size(); i++)
-    {
-        rs->free_rid(instance_keys[i]);
-    }
+	// create new chunk instance
+	Ref<ChunkInstance> chunk_instance = memnew(ChunkInstance);
+	chunk_instances[p_position] = chunk_instance;
 
-    chunk_instances.clear();
-    chunk_meshes.clear();
-}
-
-void VoxelWorldInstance::generate_chunk(ChunkData *p_chunk_data)
-{
-	ERR_FAIL_NULL(p_chunk_data);
-    ERR_FAIL_NULL(world);
-	
+	// generate mesh
 	PackedVector3Array collision_points = PackedVector3Array();
+	Ref<ArrayMesh> mesh = generate_mesh(chunk_data, collision_points);
+	chunk_instance->set_mesh(mesh);
 
-	Ref<ArrayMesh> mesh = generate_mesh(p_chunk_data, collision_points);
+	// setup rendering server
+	RenderingServer* rs = RenderingServer::get_singleton();
+	RID instance = rs->instance_create();
 
-    Vector3 world_position = Vector3() * world->get_voxel_size() * world->get_chunk_size();
-
-    RenderingServer *rs = RenderingServer::get_singleton();
-    RID instance = rs->instance_create();
-    rs->instance_set_base(instance, mesh->get_rid());
+    Vector3 world_position = Vector3(p_position) * world->get_voxel_size() * world->get_chunk_size();
+	rs->instance_set_base(instance, mesh->get_rid());
     rs->instance_set_transform(instance, Transform3D(Basis(), world_position));
     rs->instance_set_scenario(instance, get_world_3d()->get_scenario());
+}
 
-    chunk_meshes[Vector3i()] = mesh;
-    chunk_instances[Vector3i()] = instance;
+void VoxelWorldInstance::unload_chunk(Vector3 p_position)
+{
+	ERR_FAIL_NULL_MSG(world, "VoxelWorldInstance::unload_chunk() world is null");
+	ERR_FAIL_NULL_MSG(chunk_instances, "VoxelWorldInstance::unload_chunk() chunk_instances is null");
+
+	if (!chunk_instances.has(p_position))
+	{
+		return;
+	}
+
+	Ref<ChunkInstance> chunk_instance = chunk_instances[p_position];
+	chunk_instance->set_mesh(Ref<ArrayMesh>());
+	chunk_instances.erase(p_position);
+
+	RenderingServer* rs = RenderingServer::get_singleton();
+	rs->free_rid(chunk_instance->get_rendering_instance());
 }
 
 Ref<ArrayMesh> VoxelWorldInstance::generate_mesh(ChunkData* p_chunk_data, PackedVector3Array &p_collision_points)
@@ -300,3 +309,51 @@ Ref<ArrayMesh> VoxelWorldInstance::generate_mesh(ChunkData* p_chunk_data, Packed
 	return mesh;
 }
 
+ChunkInstance::ChunkInstance()
+{
+}
+
+ChunkInstance::~ChunkInstance()
+{
+}
+
+void ChunkInstance::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("get_mesh"), &ChunkInstance::get_mesh);
+	ClassDB::bind_method(D_METHOD("set_mesh", "p_mesh"), &ChunkInstance::set_mesh);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "mesh", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "ArrayMesh"), "set_mesh", "get_mesh");
+
+	ClassDB::bind_method(D_METHOD("get_world_position"), &ChunkInstance::get_world_position);
+	ClassDB::bind_method(D_METHOD("set_world_position", "p_world_position"), &ChunkInstance::set_world_position);
+	ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "world_position"), "set_world_position", "get_world_position");
+}
+
+Ref<ArrayMesh> ChunkInstance::get_mesh() const
+{
+	return mesh;
+}
+
+void ChunkInstance::set_mesh(Ref<ArrayMesh> p_mesh)
+{
+	mesh = p_mesh;
+}
+
+Vector3 ChunkInstance::get_world_position() const
+{
+	return world_position;
+}
+
+void ChunkInstance::set_world_position(Vector3 p_world_position)
+{
+	world_position = p_world_position;
+}
+
+RID ChunkInstance::get_rendering_instance() const
+{
+	return rendering_instance;
+}
+
+void ChunkInstance::set_rendering_instance(RID p_rendering_instance)
+{
+	rendering_instance = p_rendering_instance;
+}

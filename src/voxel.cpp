@@ -1,5 +1,7 @@
 #include "voxel.hpp"
 
+#include <godot_cpp/variant/utility_functions.hpp>
+
 using namespace godot;
 
 Voxel::Voxel()
@@ -24,6 +26,11 @@ int Voxel::get_id() const
 
 void Voxel::set_id(int p_id)
 {
+	if (p_id == 0)
+	{
+		UtilityFunctions::push_warning("Voxel ID should not be 0: ", get_name());
+	}
+
 	id = p_id;
 }
 

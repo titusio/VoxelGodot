@@ -1,11 +1,14 @@
 #include "voxel_set.hpp"
 
+#include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/core/class_db.hpp>
 
 using namespace godot;
 
 VoxelSet::VoxelSet()
 {
+	id_counter = 1;
+	voxels = Array();
 }
 
 VoxelSet::~VoxelSet()
@@ -14,6 +17,7 @@ VoxelSet::~VoxelSet()
 
 int VoxelSet::get_new_id()
 {
+	UtilityFunctions::print(id_counter);
 	return id_counter++;
 }
 

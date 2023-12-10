@@ -41,11 +41,11 @@ namespace godot
         {
         case GENERATE:
             ERR_FAIL_NULL_MSG(instance, "Voxel World Instance is Null");
-            instance->generate();
+            // instance->generate();
             break;
         case CLEAR:
             ERR_FAIL_NULL_MSG(instance, "Voxel World Instance is Null");
-            instance->clear();
+            // instance->clear();
             break;
         }
     }

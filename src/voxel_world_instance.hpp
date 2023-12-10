@@ -45,16 +45,41 @@ namespace godot
         Ref<VoxelWorld> get_voxel_world() const;
         void set_voxel_world(Ref<VoxelWorld> p_world);
 
-        void generate();
-        void clear();
+		void load_chunk(Vector3 p_position);
+		void unload_chunk(Vector3 p_position);
 
     private:
-        void generate_chunk(ChunkData *p_chunk_data);
 		Ref<ArrayMesh> generate_mesh(ChunkData *p_chunk_data, PackedVector3Array &p_collision_points);
 
     protected:
         static void _bind_methods();
     };
+
+	class ChunkInstance : public RefCounted
+	{
+		GDCLASS(ChunkInstance, RefCounted);
+
+	private:
+		Ref<ArrayMesh> mesh;
+		Vector3 world_position;
+		RID rendering_instance;
+	
+	public:
+		ChunkInstance();
+		~ChunkInstance();
+
+		Ref<ArrayMesh> get_mesh() const;
+		void set_mesh(Ref<ArrayMesh> p_mesh);
+
+		Vector3 get_world_position() const;
+		void set_world_position(Vector3 p_world_position);
+	
+		RID get_rendering_instance() const;
+		void set_rendering_instance(RID p_rendering_instance);
+
+	protected:
+		static void _bind_methods();
+	};
 } // namespace godot
 
 #endif // VOXEL_WORLD_INSTANCE_HPP
