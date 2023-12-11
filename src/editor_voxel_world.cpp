@@ -166,7 +166,7 @@ bool EditorVoxelWorld::_get(const StringName &p_name, Variant &r_ret) const
 		ChunkData* chunk = Object::cast_to<ChunkData>(chunks[position]);
 		if (chunk == nullptr)
 		{
-			UtilityFunctions::printerr("Chunk not found");
+			UtilityFunctions::printerr("Error while getting chunk property: Chunk not found");
 			return false;
 		}
 
