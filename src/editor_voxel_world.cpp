@@ -29,6 +29,8 @@ void EditorVoxelWorld::set_world_bounds(AABB p_world_bounds)
 	world_bounds.size.y = UtilityFunctions::roundf(world_bounds.size.y);
 	world_bounds.size.z = UtilityFunctions::roundf(world_bounds.size.z);
 
+	UtilityFunctions::print("World Bounds: " + world_bounds.position + " " + world_bounds.size);
+
 	_update_chunk_list();
 }
 
@@ -68,10 +70,6 @@ void EditorVoxelWorld::_update_chunk_list()
 		}
 	}
 
-	// get voxel set for filling chunks
-	Ref<VoxelSet> voxel_set = get_voxel_set();
-	ERR_FAIL_COND_MSG(!voxel_set.is_valid(), "Voxel Set for filling Chunks wasn't found");
-
 	// create new chunks
 	for (int x = x_min; x < x_max; x++)
 	{
@@ -89,18 +87,6 @@ void EditorVoxelWorld::_update_chunk_list()
 				ChunkData* chunk = memnew(ChunkData);
 				chunk->set_chunk_size(get_chunk_size());
 				chunks[position] = chunk;
-				for (int x = 0; x < get_chunk_size(); x++)
-				{
-					for (int y = 0; y < get_chunk_size(); y++)
-					{
-						for (int z = 0; z < get_chunk_size(); z++)
-						{
-							Voxel* voxel = Object::cast_to<Voxel>(voxel_set->voxels[0]);
-							chunk->set_voxel(Vector3i(x, y, z), voxel);
-						}
-					}
-				}
-				// end filling chunk
 			}
 		}
 	}
@@ -120,6 +106,7 @@ bool EditorVoxelWorld::_set(const StringName &p_name, const Variant &p_value)
 
 	if (components[0] == "chunks")
 	{
+		UtilityFunctions::print("Setting chunk property: " + p_name);
 		String position_string = components[1];
 		PackedStringArray position_components = position_string.split("_");
 		Vector3i position = Vector3i(position_components[0].to_int(), position_components[1].to_int(), position_components[2].to_int());
